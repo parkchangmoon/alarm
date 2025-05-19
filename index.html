@@ -65,7 +65,7 @@
       document.getElementById("status").textContent = `알람이 ${alarmTime}로 설정되었습니다.`;
 
       if (alarmInterval) clearInterval(alarmInterval);
-      alarmInterval = setInterval(checkAlarm, 10000);
+      alarmInterval = setInterval(checkAlarm, 1000);
     }
 
     function checkAlarm() {

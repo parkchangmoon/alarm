@@ -49,7 +49,7 @@
         return;
       }
 
-      // 오디오 미리 재생 (브라우저 제한 해제용)
+      // 사용자 상호작용으로 오디오 미리 재생 (브라우저 제한 해제용)
       const preloadSound = new Audio("bell-bowl-1.mp3");
       preloadSound.play().then(() => {
         preloadSound.pause();
@@ -71,23 +71,29 @@
 
       if (nowTime === alarmTime) {
         clearInterval(alarmInterval);
-        ringBell();
+        ringBellSequentially(repeat);
       }
     }
 
-    function ringBell() {
+    function ringBellSequentially(times) {
       let count = 0;
 
-      const ring = setInterval(() => {
+      function playNext() {
+        if (count >= times) {
+          document.getElementById("status").textContent = "알람이 울렸습니다.";
+          return;
+        }
+
         const sound = new Audio("bell-bowl-1.mp3");
         sound.play();
-
         count++;
-        if (count >= repeat) {
-          clearInterval(ring);
-          document.getElementById("status").textContent = "알람이 울렸습니다.";
-        }
-      }, 1000);
+
+        sound.addEventListener("ended", () => {
+          setTimeout(playNext, 300); // 살짝 쉬고 다음 소리 재생
+        });
+      }
+
+      playNext(); // 첫 번째 소리 재생 시작
     }
   </script>
 

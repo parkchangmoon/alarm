@@ -35,9 +35,6 @@
   <button onclick="setAlarm()">알람 설정</button>
   <p id="status">알람이 설정되지 않았습니다.</p>
 
-  
-  <audio id="ding" src="bell-bowl-1.mp3" preload="auto"></audio>
-
   <script>
     let alarmTime = null;
     let repeat = 1;
@@ -46,18 +43,18 @@
     function setAlarm() {
       const timeInput = document.getElementById("alarmTime").value;
       repeat = parseInt(document.getElementById("repeatCount").value);
-      const ding = document.getElementById("ding");
 
       if (!timeInput) {
         alert("알람 시간을 설정하세요.");
         return;
       }
 
-      // 사용자 상호작용 시 오디오를 미리 한번 재생해서 브라우저가 허용하게 함
-      ding.play().then(() => {
-        ding.pause();
-        ding.currentTime = 0;
-      }).catch((e) => {
+      // 오디오 미리 재생 (브라우저 제한 해제용)
+      const preloadSound = new Audio("bell-bowl-1.mp3");
+      preloadSound.play().then(() => {
+        preloadSound.pause();
+        preloadSound.currentTime = 0;
+      }).catch(e => {
         console.warn("오디오 미리 재생 실패:", e);
       });
 
@@ -79,11 +76,12 @@
     }
 
     function ringBell() {
-      const ding = document.getElementById("ding");
       let count = 0;
 
       const ring = setInterval(() => {
-        ding.play();
+        const sound = new Audio("bell-bowl-1.mp3");
+        sound.play();
+
         count++;
         if (count >= repeat) {
           clearInterval(ring);

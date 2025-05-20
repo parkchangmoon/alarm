@@ -49,7 +49,25 @@
         return;
       }
 
-      // 사용자 상호작용으로 오디오 미리 재생 (브라우저 제한 해제용)
+      // 현재 시각과 알람 시각 차이 계산
+      const now = new Date();
+      const [hour, minute] = timeInput.split(":").map(Number);
+      const alarm = new Date();
+      alarm.setHours(hour, minute, 0, 0);
+
+      if (alarm <= now) {
+        alarm.setDate(alarm.getDate() + 1); // 자정을 넘어가는 경우
+      }
+
+      const diffMs = alarm - now;
+      const diffMins = Math.floor(diffMs / 60000);
+      const hoursLeft = Math.floor(diffMins / 60);
+      const minsLeft = diffMins % 60;
+
+      // 음성 안내
+      speak(`지금부터 ${hoursLeft > 0 ? hoursLeft + '시간 ' : ''}${minsLeft}분 후에 알람을 울리겠습니다.`);
+
+      // 오디오 미리 재생
       const preloadSound = new Audio("bell-bowl-1.mp3");
       preloadSound.play().then(() => {
         preloadSound.pause();
@@ -89,11 +107,29 @@
         count++;
 
         sound.addEventListener("ended", () => {
-          setTimeout(playNext, 300); // 살짝 쉬고 다음 소리 재생
+          setTimeout(playNext, 300); // 벨 간 간격
         });
       }
 
-      playNext(); // 첫 번째 소리 재생 시작
+      playNext();
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'ko-KR';
+
+        // 여자 음성 선택 (있다면)
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.lang === 'ko-KR' && v.name.includes('Female'));
+        if (femaleVoice) {
+          utter.voice = femaleVoice;
+        }
+
+        window.speechSynthesis.speak(utter);
+      } else {
+        alert("이 브라우저는 음성 합성을 지원하지 않습니다.");
+      }
     }
   </script>
 
